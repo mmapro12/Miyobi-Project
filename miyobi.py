@@ -66,7 +66,7 @@ def main(cam, q_but):
             # Depth is close
             if d <= 35:
                 cvzone.putTextRect(frame, "Be careful", (20, 70), 5, 3, (0, 0, 255))
-                brig.set_brightness(20)
+                brig.set_brightness(15)
             else:
                 cvzone.putTextRect(frame, "Good", (20, 70), 5, 3, (0, 255, 0))
                 brig.set_brightness(100)
