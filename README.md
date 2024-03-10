@@ -19,5 +19,5 @@ Projenin GUI kısmından başlamak istiyorsanız app.py uygulamasını çalışt
 ```
 Uygulamanın .exe dosyasını indirmek için aşağıdaki linke tıklayın:
 ```bash 
-  HALA HAZIR DEĞİL!
+  https://miyobi.netlify.app/
 ```
