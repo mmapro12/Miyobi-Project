@@ -87,4 +87,5 @@ def main(cam, q_but):
 
 
 if __name__ == "__main__":
+    print("Welcome to Miyobi System! ")
     main(0, "q")
