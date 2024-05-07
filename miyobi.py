@@ -3,7 +3,6 @@ import cvzone
 from cvzone.FaceMeshModule import FaceMeshDetector
 import screen_brightness_control as brig
 
-
 def main(cam, q_but):
     if cam:
         cam_num = cam
@@ -70,6 +69,8 @@ def main(cam, q_but):
             else:
                 cvzone.putTextRect(frame, "Good", (20, 70), 5, 3, (0, 255, 0))
                 brig.set_brightness(100)
+            
+            # TEST FOR ADULT AND CHILD ESTIMATION
 
             # Adding text in the video
             cvzone.putTextRect(frame,
