@@ -3,6 +3,8 @@ import cvzone
 from cvzone.FaceMeshModule import FaceMeshDetector
 import screen_brightness_control as brig
 
+BRIGHTNESS = 5
+
 def main(cam, q_but):
     if cam:
         cam_num = cam
@@ -27,7 +29,7 @@ def main(cam, q_but):
             cam_num = 0
             f = 620
         else:
-            quit("Camera cant open!")
+            quit("We can't using camera now!")
 
     quit_button = "q" if not q_but else str(q_but[0])
 
@@ -65,7 +67,7 @@ def main(cam, q_but):
             # Depth is close
             if d <= 35:
                 cvzone.putTextRect(frame, "Be careful", (20, 70), 5, 3, (0, 0, 255))
-                brig.set_brightness(15)
+                brig.set_brightness(BRIGHTNESS)
             else:
                 cvzone.putTextRect(frame, "Good", (20, 70), 5, 3, (0, 255, 0))
                 brig.set_brightness(100)
