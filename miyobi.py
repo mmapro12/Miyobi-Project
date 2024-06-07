@@ -1,93 +1,73 @@
 import cv2
 import cvzone
 from cvzone.FaceMeshModule import FaceMeshDetector
-import screen_brightness_control as brig
+import screen_brightness_control as sbc
 
-BRIGHTNESS = 5
+BRIGHTNESS = 5  # %5 parlaklık
+NORMAL_BRIGHTNESS = sbc.get_brightness()  # Normal parlaklık %100
 
-def main(cam, q_but):
-    if cam:
-        cam_num = cam
+def get_camera():
+    for cam_num in range(6):
+        cap = cv2.VideoCapture(cam_num, cv2.CAP_DSHOW)
+        if cap.isOpened():
+            return cam_num, cap
+    raise ValueError("Cant find useable camera!")
+
+def calculate_distance(w, W=6.3, f=600):
+    return W * f / w
+
+def set_brightness(distance, threshold=35):
+    if distance < threshold:
+        sbc.set_brightness(BRIGHTNESS)
     else:
+        sbc.set_brightness(NORMAL_BRIGHTNESS)
 
-        if cv2.VideoCapture(5, cv2.CAP_DSHOW).isOpened():
-            cam_num = 5
-            f = 600
-        elif cv2.VideoCapture(4, cv2.CAP_DSHOW).isOpened():
-            cam_num = 4
-            f = 600
-        elif cv2.VideoCapture(3, cv2.CAP_DSHOW).isOpened():
-            cam_num = 3
-            f = 600
-        elif cv2.VideoCapture(2, cv2.CAP_DSHOW).isOpened():
-            cam_num = 2
-            f = 600
-        elif cv2.VideoCapture(1, cv2.CAP_DSHOW).isOpened():
-            cam_num = 1
-            f = 600
-        elif cv2.VideoCapture(0, cv2.CAP_DSHOW).isOpened():
-            cam_num = 0
-            f = 620
+def main(cam, quit_button='q'):
+    try:
+        if cam:
+            cap = cv2.VideoCapture(cam, cv2.CAP_DSHOW)
         else:
-            quit("We can't using camera now!")
+            cam_num, cap = get_camera()
+        detector = FaceMeshDetector(maxFaces=1)
 
-    quit_button = "q" if not q_but else str(q_but[0])
+        while True:
+            success, frame = cap.read()
+            if not success:
+                raise ValueError("Cant use camera now!")
 
-    cap = cv2.VideoCapture(cam_num, cv2.CAP_DSHOW)
-    detector = FaceMeshDetector(maxFaces=1)
+            frame, faces = detector.findFaceMesh(frame, draw=False)
 
-    if not cap.isOpened():
-        quit(f"Camera `{cam_num}` can't open!")
+            if faces:
+                face = faces[0]
+                pointLeft = face[145]
+                pointRight = face[374]
 
-    while True:
-        success, frame = cap.read()
-        if not success:
-            quit(f"Camera not usable!")
+                w, _ = detector.findDistance(pointLeft, pointRight)
+                d = calculate_distance(w)
 
-        # Finding faces
-        frame, faces = detector.findFaceMesh(frame, draw=False)
+                if d <= 35:
+                    cvzone.putTextRect(frame, "Be careful", (20, 70), 5, 3, (0, 0, 255))
+                else:
+                    cvzone.putTextRect(frame, "Good", (20, 70), 5, 3, (0, 255, 0))
 
-        if faces:
-            face = faces[0]
-            pointLeft = face[145]
-            pointRight = face[374]
+                set_brightness(d)
 
-            w, _ = detector.findDistance(pointLeft, pointRight)
-            W = 6.3
+                cvzone.putTextRect(frame,
+                                   f"{int(d)} cm",
+                                   (face[10][0] - 100, face[10][1] - 50),
+                                   scale=2)
 
-            # Finding Focal Length
-            # d = 30
-            # f = (w * d) / W
-            # print(f)
+            cv2.imshow("Miyobi", frame)
+            if cv2.waitKey(1) == ord(quit_button):
+                break
 
-
-            d = W * f / w
-            # ! print(d)
-
-            # Depth is close
-            if d <= 35:
-                cvzone.putTextRect(frame, "Be careful", (20, 70), 5, 3, (0, 0, 255))
-                brig.set_brightness(BRIGHTNESS)
-            else:
-                cvzone.putTextRect(frame, "Good", (20, 70), 5, 3, (0, 255, 0))
-                brig.set_brightness(100)
-            
-            # TEST FOR ADULT AND CHILD ESTIMATION
-
-            # Adding text in the video
-            cvzone.putTextRect(frame,
-                               f"Depth: {int(d)} cm",
-                               (face[10][0] - 100, face[10][1] - 50),
-                               scale=2
-                               )
-
-        cv2.imshow("Eye Guard", frame)
-        if cv2.waitKey(1) == ord(quit_button):
-            break
-
-    cap.release()
-    cv2.destroyAllWindows()
-
+        cap.release()
+        cv2.destroyAllWindows()
+    
+    except ValueError as e:
+        print(e)
+        cap.release()
+        cv2.destroyAllWindows()
 
 if __name__ == "__main__":
     print("Welcome to Miyobi System! ")
