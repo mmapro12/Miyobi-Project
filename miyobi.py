@@ -62,7 +62,7 @@ def main(cam, q_but):
 
 
             d = W * f / w
-            print(d)
+            # ! print(d)
 
             # Depth is close
             if d <= 35:
