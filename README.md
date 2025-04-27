@@ -1,4 +1,8 @@
 
+Dikkat: proje artik şuradan yönetiliyor(yani burası artık kullanılmıyor): 
+https://github.com/mmapro12/miyobi
+
+
 # Miyobi Project v2
 
 Bu proje IZREF grubu tarafından yapılmıştır.
